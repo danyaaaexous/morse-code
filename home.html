@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="SIGNAL — Interactive Morse Code Translator. Tap the telegraph key to input dots and dashes. Real-time decoding into text."
+    />
+    <title>SIGNAL — Morse Code Translator</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <!-- ══════════════════════════════════════════════
+       NAV
+  ══════════════════════════════════════════════ -->
+    <nav role="navigation" aria-label="Main navigation">
+      <a href="#translator" class="nav-logo" aria-label="SIGNAL home">SIGNAL</a>
+
+      <ul class="nav-links">
+        <li>
+          <a href="#translator" class="active" id="nav-translator"
+            >TRANSLATOR</a
+          >
+        </li>
+        <li><a href="#reference" id="nav-reference">REFERENCE</a></li>
+        <li><a href="#about" id="nav-about">ABOUT</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <!-- Audio toggle -->
+        <button
+          class="icon-btn"
+          id="audio-toggle"
+          title="Mute audio"
+          aria-label="Toggle audio"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+          </svg>
+        </button>
+        <!-- Theme toggle -->
+        <button
+          class="icon-btn"
+          id="theme-toggle"
+          title="Toggle light/dark theme"
+          aria-label="Toggle theme"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          </svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ══════════════════════════════════════════════
+       MAIN
+  ══════════════════════════════════════════════ -->
+    <main>
+      <!-- ── Translator ──────────────────────────── -->
+      <section id="translator" aria-label="Morse code translator">
+        <!-- Left: Telegraph Key -->
+        <div class="key-panel">
+          <div class="key-label">
+            <span class="label-tag">MANUAL_PULSE_INPUT</span>
+            <h2>TELEGRAPH KEY</h2>
+          </div>
+
+          <div class="key-wrapper">
+            <!-- Token flash: shows · or — on each tap -->
+            <div class="token-flash-container">
+              <div id="token-flash" aria-live="polite" aria-atomic="true"></div>
+            </div>
+
+            <button
+              id="telegraph-key"
+              aria-label="Telegraph key — short tap for dot, hold for dash"
+              title="Tap = dot  |  Hold = dash"
+            >
+              <div id="key-ring">
+                <div id="key-inner"></div>
+              </div>
+            </button>
+          </div>
+
+          <p class="key-hint">
+            TAP = DOT &nbsp;|&nbsp; HOLD = DASH &nbsp;|&nbsp; SPACE BAR
+          </p>
+
+          <!-- Timing legend -->
+          <div class="timing-legend">
+            <div class="timing-row">
+              <span class="timing-token dot">·</span>
+              <span class="timing-desc">tap ≤ 250 ms</span>
+            </div>
+            <div class="timing-row">
+              <span class="timing-token dash">—</span>
+              <span class="timing-desc">hold &gt; 250 ms</span>
+            </div>
+            <div class="timing-row">
+              <span class="timing-token sep">letter</span>
+              <span class="timing-desc">pause 0.6 s</span>
+            </div>
+            <div class="timing-row">
+              <span class="timing-token sep">word</span>
+              <span class="timing-desc">pause 1.4 s</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Output panels -->
+        <div class="output-panel">
+          <!-- Sequence stream -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <span class="panel-header-label">TAPPED_SEQUENCE_STREAM</span>
+              <div class="panel-actions">
+                <button
+                  class="icon-btn"
+                  id="btn-copy"
+                  title="Copy decoded text"
+                  aria-label="Copy decoded text"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                    <path
+                      d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                    />
+                  </svg>
+                </button>
+                <button
+                  class="icon-btn"
+                  id="btn-share"
+                  title="Share decoded text"
+                  aria-label="Share decoded text"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="18" cy="5" r="3" />
+                    <circle cx="6" cy="12" r="3" />
+                    <circle cx="18" cy="19" r="3" />
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                  </svg>
+                </button>
+                <button
+                  class="icon-btn"
+                  id="btn-reset"
+                  title="Reset buffer"
+                  aria-label="Reset buffer"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polyline points="1 4 1 10 7 10" />
+                    <path d="M3.51 15a9 9 0 1 0 .49-3.14" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div
+                id="sequence-display"
+                role="status"
+                aria-live="polite"
+                aria-label="Morse sequence"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Translation -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <span class="panel-header-label">REALTIME_TRANSLATION</span>
+            </div>
+            <div class="panel-body">
+              <div
+                id="translation-display"
+                role="status"
+                aria-live="polite"
+                aria-label="Decoded text"
+              >
+                <span class="waiting">WAITING_FOR_SIGNAL...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /output-panel -->
+      </section>
+      <!-- /translator -->
+
+      <!-- ── Reference Table ────────────────────── -->
+      <section id="reference" aria-label="Morse code reference">
+        <div class="section-header">
+          <div class="section-title-block">
+            <span class="section-tag">TECHNICAL_REFERENCE</span>
+            <h2>MORSE_ALPHABET</h2>
+            <p>
+              International Morse Code. The foundation of modern
+              telecommunication. Dots, dashes, and the rhythm of the pulse.
+            </p>
+          </div>
+
+          <div class="search-wrapper">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input
+              type="search"
+              id="ref-search"
+              placeholder="SEARCH_GLOSSARY"
+              aria-label="Search morse reference"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+        </div>
+
+        <div
+          id="reference-grid"
+          role="list"
+          aria-label="Morse code alphabet reference"
+        ></div>
+      </section>
+
+      <!-- ── About cards ────────────────────────── -->
+      <section id="about" aria-label="About Morse code">
+        <div class="info-card">
+          <div class="card-icon">📡</div>
+          <h3>HOW_TO_USE</h3>
+          <p>
+            Press the telegraph key (or Space bar) briefly for a
+            <strong>dot</strong>, hold longer than 250 ms for a
+            <strong>dash</strong>. Pause 0.6 s to complete a letter, 1.4 s to
+            add a word space. The translation updates in real time.
+          </p>
+        </div>
+        <div class="info-card">
+          <div class="card-icon">⚡</div>
+          <h3>AUDIO_FEEDBACK</h3>
+          <p>
+            Each key press generates an authentic 650 Hz sine-wave tone — the
+            classic frequency used in vintage CW radio operation. Toggle audio
+            with the speaker icon in the nav bar.
+          </p>
+        </div>
+        <div class="info-card">
+          <div class="card-icon">🔤</div>
+          <h3>SUPPORTED_CHARS</h3>
+          <p>
+            Full International Morse Code — A–Z, 0–9, and common punctuation
+            marks including period, comma, question mark, slash, parentheses,
+            and more.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- ══════════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════════ -->
+    <footer>
+      <p>© 2026 SIGNAL PULSE. MORSE CODE TRANSLATOR</p>
+      <a
+        href="https://github.com/danyaaaexous"
+        target="_blank"
+        rel="noopener noreferrer"
+        >GITHUB</a
+      >
+    </footer>
+
+    <!-- Toast notification container (injected by JS) -->
+
+    <!-- ══════════════════════════════════════════════
+       SCRIPTS  (ES modules — no bundler needed)
+  ══════════════════════════════════════════════ -->
+    <script src="js/app.js"></script>
+  </body>
+</html>
